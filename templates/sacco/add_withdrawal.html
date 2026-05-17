@@ -1,0 +1,64 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Add Withdrawal{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="mb-4">Add New Withdrawal</h2>
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="{{ form.member.id_for_label }}" class="form-label">Member *</label>
+                            {{ form.member }}
+                            {% if form.member.errors %}
+                                <div class="text-danger small mt-1">{{ form.member.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.amount.id_for_label }}" class="form-label">Amount *</label>
+                            {{ form.amount }}
+                            {% if form.amount.errors %}
+                                <div class="text-danger small mt-1">{{ form.amount.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.purpose.id_for_label }}" class="form-label">Purpose *</label>
+                            {{ form.purpose }}
+                            {% if form.purpose.errors %}
+                                <div class="text-danger small mt-1">{{ form.purpose.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Status *</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                                <div class="text-danger small mt-1">{{ form.status.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.payment_method.id_for_label }}" class="form-label">Payment Method *</label>
+                            {{ form.payment_method }}
+                            {% if form.payment_method.errors %}
+                                <div class="text-danger small mt-1">{{ form.payment_method.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">Add Withdrawal</button>
+                            <a href="{% url 'sacco:withdrawals_list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

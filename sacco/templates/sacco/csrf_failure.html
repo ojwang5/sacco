@@ -1,0 +1,34 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}CSRF Error - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4>CSRF Verification Failed</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-danger">The CSRF token verification failed. This can happen for several reasons:</p>
+                <ul>
+                    <li>Your browser session may have expired</li>
+                    <li>You may have logged in from another tab or window</li>
+                    <li>You may have used the back button after logging in</li>
+                    <li>Your browser may not be accepting cookies</li>
+                </ul>
+                <p>Please try the following:</p>
+                <ol>
+                    <li>Refresh the page</li>
+                    <li>Clear your browser cookies and cache</li>
+                    <li>Log in again</li>
+                </ol>
+                <div class="mt-4">
+                    <a href="{% url 'sacco:login' %}" class="btn btn-primary">Go to Login</a>
+                    <a href="{% url 'sacco:dashboard' %}" class="btn btn-secondary">Go to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

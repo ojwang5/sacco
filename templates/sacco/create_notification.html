@@ -1,0 +1,201 @@
+{% extends 'sacco/base.html' %}
+{% load static %}
+
+{% block title %}Send Notification to Member - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-envelope"></i> Send Notification
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST" novalidate id="notificationForm">
+                        {% csrf_token %}
+
+                        <!-- Send to All Members Option -->
+                        <div class="mb-4 p-3 border rounded bg-light">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="{{ form.send_to_all_members.id_for_label }}" 
+                                       name="{{ form.send_to_all_members.name }}" 
+                                       onchange="toggleMemberField()">
+                                <label class="form-check-label fw-bold" for="{{ form.send_to_all_members.id_for_label }}">
+                                    <i class="fas fa-broadcast-tower"></i> Send to All Members (General Message)
+                                </label>
+                            </div>
+                            <small class="form-text text-muted d-block mt-2">
+                                Check this to broadcast the notification to all members. Uncheck to send to a specific member only.
+                            </small>
+                            {% if form.send_to_all_members.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.send_to_all_members.errors|first }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Member Selection (Hidden when "Send to All" is checked) -->
+                        <div class="mb-3" id="memberField">
+                            <label for="{{ form.member.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-user"></i> Select Member
+                            </label>
+                            <select class="form-select {% if form.member.errors %}is-invalid{% endif %}" 
+                                    id="{{ form.member.id_for_label }}" 
+                                    name="{{ form.member.name }}" 
+                                    required>
+                                <option value="">-- Choose a member --</option>
+                                {% for member in form.member.queryset %}
+                                    <option value="{{ member.pk }}" 
+                                            {% if form.member.value == member.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ member.name }} (ID: {{ member.id_number }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.member.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.member.errors|first }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">Choose the member who will receive this notification</small>
+                        </div>
+
+                        <!-- Notification Title -->
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-heading"></i> Notification Title
+                            </label>
+                            <input type="text" 
+                                   class="form-control {% if form.title.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.title.id_for_label }}" 
+                                   name="{{ form.title.name }}" 
+                                   placeholder="Enter notification title" 
+                                   value="{{ form.title.value|default:'' }}"
+                                   required 
+                                   maxlength="255">
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.title.errors|first }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">Keep it short and descriptive (max 255 characters)</small>
+                        </div>
+
+                        <!-- Notification Message -->
+                        <div class="mb-3">
+                            <label for="{{ form.message.id_for_label }}" class="form-label fw-bold">
+                                <i class="fas fa-envelope-open-text"></i> Message
+                            </label>
+                            <textarea class="form-control {% if form.message.errors %}is-invalid{% endif %}" 
+                                      id="{{ form.message.id_for_label }}" 
+                                      name="{{ form.message.name }}" 
+                                      rows="6" 
+                                      placeholder="Enter your notification message..." 
+                                      required>{{ form.message.value|default:'' }}</textarea>
+                            {% if form.message.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.message.errors|first }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">Provide detailed information for the member(s)</small>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'sacco:admin_notifications' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Notifications
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Send Notification
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card mt-4 border-info">
+                <div class="card-body bg-light">
+                    <h6 class="card-title text-info">
+                        <i class="fas fa-info-circle"></i> Tips
+                    </h6>
+                    <ul class="mb-0 text-muted small">
+                        <li><strong>Send to All Members:</strong> Creates a notification for every member in the system</li>
+                        <li><strong>Send to Specific Member:</strong> Sends notification to only the selected member</li>
+                        <li>Notifications are marked as <strong>pending</strong> until members read them</li>
+                        <li>Members will see a <span class="badge bg-danger">●</span> <strong>red dot</strong> indicator for unread notifications</li>
+                        <li>You can provide additional information in the message field (max 5000 characters)</li>
+                        <li>Members can reply to notifications if needed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleMemberField() {
+        const checkbox = document.getElementById('{{ form.send_to_all_members.id_for_label }}');
+        const memberField = document.getElementById('memberField');
+        const memberSelect = document.getElementById('{{ form.member.id_for_label }}');
+
+        if (checkbox.checked) {
+            // Hide member field and make it not required
+            memberField.style.display = 'none';
+            memberSelect.removeAttribute('required');
+            memberSelect.value = '';
+        } else {
+            // Show member field and make it required
+            memberField.style.display = 'block';
+            memberSelect.setAttribute('required', 'required');
+        }
+    }
+
+    // Initialize on page load in case form has validation errors with checkbox already checked
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleMemberField();
+    });
+</script>
+
+<style>
+    .card-header {
+        border-bottom: 2px solid rgba(0,0,0,.125);
+    }
+    
+    .form-label {
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    
+    .form-check {
+        padding-left: 0;
+    }
+
+    .form-check-input {
+        margin-left: 0;
+        margin-right: 0.5rem;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+    }
+</style>
+{% endblock %}

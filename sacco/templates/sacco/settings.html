@@ -1,0 +1,148 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Settings - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <!-- Profile Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4><i class="fas fa-user"></i> Profile Information</h4>
+                </div>
+                <div class="card-body">
+                    {% if member_exists %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="update_profile" value="1">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_name" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="id_name" name="name" value="{{ member.name }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_id_number" class="form-label">ID Number</label>
+                                    <input type="text" class="form-control" id="id_id_number" name="id_number" value="{{ member.id_number }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="id_phone" name="phone" value="{{ member.phone }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="id_email" name="email" value="{{ member.email }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_address" class="form-label">Address</label>
+                            <textarea class="form-control" id="id_address" name="address" rows="3">{{ member.address }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                    {% else %}
+                    <p class="text-danger">Member profile not found. Please contact admin.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Change Password -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4><i class="fas fa-lock"></i> Change Password</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="change_password" value="1">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required minlength="8">
+                            <div class="form-text">Password must be at least 8 characters long.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning">Change Password</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4><i class="fas fa-info-circle"></i> Account Information</h4>
+                </div>
+                <div class="card-body">
+                    {% if member_exists %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Member ID:</strong> {{ member.member_id }}</p>
+                            <p><strong>Join Date:</strong> {{ member.join_date }}</p>
+                            <p><strong>Role:</strong> {{ member.get_role_display }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Last Login:</strong> {{ user.last_login|date:"M d, Y H:i" }}</p>
+                            <p><strong>Account Status:</strong>
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Admin Settings -->
+            {% if is_admin %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4><i class="fas fa-cog"></i> Admin Settings</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h6>Quick Actions</h6>
+                                <a href="{% url 'sacco:add_member' %}" class="btn btn-sm btn-outline-primary me-2">Add Member</a>
+                                <a href="{% url 'sacco:members_list' %}" class="btn btn-sm btn-outline-secondary">Manage Members</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h6>Reports</h6>
+                                <a href="{% url 'sacco:reports' %}" class="btn btn-sm btn-outline-info">View Reports</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Back Button -->
+            <div class="text-center">
+                <a href="{% url 'sacco:dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,331 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Superadmin Notifications Management - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-crown text-warning"></i> Notifications Management (Superadmin)
+                </h2>
+                <a href="{% url 'sacco:create_notification' %}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Send Notification
+                </a>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-2">
+                    <div class="card text-white bg-primary">
+                        <div class="card-body">
+                            <h5 class="card-title">Total</h5>
+                            <h2 class="card-text">{{ total_notifications }}</h2>
+                            <small>All notifications</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-white bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">Pending</h5>
+                            <h2 class="card-text">{{ pending_count }}</h2>
+                            <small>Unread</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-white bg-info">
+                        <div class="card-body">
+                            <h5 class="card-title">Read</h5>
+                            <h2 class="card-text">{{ read_count }}</h2>
+                            <small>Viewed</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">Resolved</h5>
+                            <h2 class="card-text">{{ resolved_count }}</h2>
+                            <small>Completed</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-white bg-secondary">
+                        <div class="card-body">
+                            <h5 class="card-title">Admin Messages</h5>
+                            <h2 class="card-text">{{ admin_messages_count }}</h2>
+                            <small>Sent by admin</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-white bg-dark">
+                        <div class="card-body">
+                            <h5 class="card-title">System</h5>
+                            <h2 class="card-text">{{ loan_related_count|add:withdrawal_related_count }}</h2>
+                            <small>Loan & Withdrawal</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs mb-4" id="notificationTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">
+                        <i class="fas fa-exclamation-circle"></i> Pending ({{ pending_count }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="read-tab" data-bs-toggle="tab" data-bs-target="#read" type="button" role="tab" aria-controls="read" aria-selected="false">
+                        <i class="fas fa-eye"></i> Read ({{ read_count }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="resolved-tab" data-bs-toggle="tab" data-bs-target="#resolved" type="button" role="tab" aria-controls="resolved" aria-selected="false">
+                        <i class="fas fa-check-circle"></i> Resolved ({{ resolved_count }})
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="notificationTabsContent">
+                <!-- Pending Notifications -->
+                <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                    {% if pending_notifications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-warning">
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Member</th>
+                                    <th>Type</th>
+                                    <th>Title</th>
+                                    <th>Created By</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for notification in pending_notifications %}
+                                <tr>
+                                    <td class="text-center">
+                                        <span class="unread-indicator" title="Unread"></span>
+                                    </td>
+                                    <td>
+                                        <strong>{{ notification.member.name }}</strong><br>
+                                        <small class="text-muted">ID: {{ notification.member.id_number }}</small>
+                                    </td>
+                                    <td>
+                                        {% if notification.notification_type == 'admin_message' %}
+                                            <span class="badge bg-purple" style="background-color: #6f42c1;">Admin Message</span>
+                                        {% elif notification.notification_type == 'loan_application' %}
+                                            <span class="badge bg-info">Loan App</span>
+                                        {% elif notification.notification_type == 'withdrawal_application' %}
+                                            <span class="badge bg-warning text-dark">Withdrawal App</span>
+                                        {% elif notification.notification_type == 'loan_approval' %}
+                                            <span class="badge bg-success">Loan Approved</span>
+                                        {% elif notification.notification_type == 'withdrawal_approval' %}
+                                            <span class="badge bg-success">Withdrawal Approved</span>
+                                        {% elif notification.notification_type == 'loan_rejection' %}
+                                            <span class="badge bg-danger">Loan Rejected</span>
+                                        {% elif notification.notification_type == 'withdrawal_rejection' %}
+                                            <span class="badge bg-danger">Withdrawal Rejected</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ notification.get_notification_type_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ notification.title }}</strong><br>
+                                        <small class="text-muted">{{ notification.message|truncatewords:15 }}</small>
+                                    </td>
+                                    <td>
+                                        {% if notification.admin_user %}
+                                            <small><strong>{{ notification.admin_user.username }}</strong><br>{{ notification.admin_user.get_full_name }}</small>
+                                        {% else %}
+                                            <small class="text-muted">System</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ notification.created_at|date:"M d, Y H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'sacco:notification_detail' notification.notification_id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-check-circle"></i> No pending notifications!
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Read Notifications -->
+                <div class="tab-pane fade" id="read" role="tabpanel" aria-labelledby="read-tab">
+                    {% if read_notifications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-info">
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Type</th>
+                                    <th>Title</th>
+                                    <th>Created By</th>
+                                    <th>Read Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for notification in read_notifications %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ notification.member.name }}</strong><br>
+                                        <small class="text-muted">ID: {{ notification.member.id_number }}</small>
+                                    </td>
+                                    <td>
+                                        {% if notification.notification_type == 'admin_message' %}
+                                            <span class="badge bg-purple" style="background-color: #6f42c1;">Admin Message</span>
+                                        {% elif notification.notification_type == 'loan_application' %}
+                                            <span class="badge bg-info">Loan App</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ notification.get_notification_type_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ notification.title }}</strong><br>
+                                        <small class="text-muted">{{ notification.message|truncatewords:15 }}</small>
+                                    </td>
+                                    <td>
+                                        {% if notification.admin_user %}
+                                            <small><strong>{{ notification.admin_user.username }}</strong></small>
+                                        {% else %}
+                                            <small class="text-muted">System</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ notification.updated_at|date:"M d, Y H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'sacco:notification_detail' notification.notification_id %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-inbox"></i> No read notifications.
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Resolved Notifications -->
+                <div class="tab-pane fade" id="resolved" role="tabpanel" aria-labelledby="resolved-tab">
+                    {% if resolved_notifications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Type</th>
+                                    <th>Title</th>
+                                    <th>Handled By</th>
+                                    <th>Resolved Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for notification in resolved_notifications %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ notification.member.name }}</strong><br>
+                                        <small class="text-muted">ID: {{ notification.member.id_number }}</small>
+                                    </td>
+                                    <td>
+                                        {% if notification.notification_type == 'admin_message' %}
+                                            <span class="badge bg-purple" style="background-color: #6f42c1;">Admin Message</span>
+                                        {% else %}
+                                            <span class="badge bg-success">{{ notification.get_notification_type_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ notification.title }}</strong><br>
+                                        <small class="text-muted">{{ notification.message|truncatewords:15 }}</small>
+                                    </td>
+                                    <td>
+                                        {% if notification.admin_user %}
+                                            <small><strong>{{ notification.admin_user.username }}</strong></small>
+                                        {% else %}
+                                            <small class="text-muted">-</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ notification.updated_at|date:"M d, Y H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'sacco:notification_detail' notification.notification_id %}" class="btn btn-sm btn-success">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-archive"></i> No resolved notifications.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Unread indicator - red dot */
+    .unread-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    /* Pulse animation for unread dot */
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 8px rgba(220, 53, 69, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+        }
+    }
+    
+    .table-warning, .table-info, .table-success {
+        font-weight: 600;
+    }
+    
+    .card-body h2 {
+        margin: 0;
+    }
+</style>
+{% endblock %}

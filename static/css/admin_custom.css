@@ -1,0 +1,200 @@
+/* Custom Admin Styling Enhancements */
+
+/* General body and container */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f7fa;
+    color: #333;
+}
+
+/* Admin header */
+.admin-header {
+    background-color: #3a6ea5;
+    color: #d4af37;
+    padding: 10px 20px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+}
+
+.admin-header .left {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.admin-header .right a {
+    color: #d4af37;
+    margin-left: 15px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.admin-header .right a:hover {
+    text-decoration: underline;
+}
+
+.admin-header .right span {
+    margin-right: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+.theme-toggle-icon {
+    cursor: pointer;
+    margin-left: 15px;
+    font-size: 1.2rem;
+}
+
+/* Section headers in site admin */
+.bg-primary {
+    background-color: #3a6ea5 !important;
+}
+
+.text-primary {
+    color: #3a6ea5 !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+    font-weight: 700;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+    font-weight: 700;
+}
+
+/* Recent actions sidebar */
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+}
+
+.p-3 {
+    padding: 1rem !important;
+}
+
+.rounded {
+    border-radius: .25rem !important;
+}
+
+/* Table styling */
+table {
+    border-collapse: separate !important;
+    border-spacing: 0 10px !important;
+}
+
+table th, table td {
+    padding: 12px 15px !important;
+    vertical-align: middle !important;
+}
+
+table tr {
+    background: #f8faff !important;
+    border-radius: 15px !important;
+    box-shadow: 0 2px 8px rgba(18,115,234,0.05);
+    margin-bottom: 10px;
+    display: block;
+}
+
+table tr td {
+    border: none !important;
+    border-bottom: 1px solid #e1e7f0 !important;
+}
+
+table tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* Add and Change links */
+a.text-success, a.text-warning {
+    text-decoration: none;
+}
+
+a.text-success:hover, a.text-warning:hover {
+    text-decoration: underline;
+}
+
+/* Modern card styles */
+.card {
+    border: none;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Button hover effects */
+.btn {
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+}
+
+.btn-success:hover {
+    box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+}
+
+.btn-warning:hover {
+    box-shadow: 0 5px 15px rgba(255,193,7,0.3);
+}
+
+/* Header gradient */
+.bg-primary {
+    background: linear-gradient(90deg, #3a6ea5 0%, #1273ea 100%) !important;
+}
+
+/* Animation for fade in */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mb-4 {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Icon styles */
+.fas {
+    margin-right: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .card {
+        margin-bottom: 20px;
+    }
+    .d-flex.gap-3 {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+}

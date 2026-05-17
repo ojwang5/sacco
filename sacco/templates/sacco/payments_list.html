@@ -1,0 +1,66 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Payments - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Payments</h1>
+            <div>
+                <div class="btn-group me-2" role="group">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Export
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'payments' 'csv' %}">CSV</a></li>
+                        <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'payments' 'pdf' %}">PDF</a></li>
+                        <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'payments' 'excel' %}">Excel</a></li>
+                        <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'payments' 'docx' %}">Word</a></li>
+                    </ul>
+                </div>
+                <a href="{% url 'sacco:add_payment' %}" class="btn btn-primary">Record Payment</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Loan</th>
+                                <th>Member</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                            <tr>
+                                <td>{{ payment.payment_id }}</td>
+                                <td>{{ payment.loan.loan_id }}</td>
+                                <td>{{ payment.loan.member.name }}</td>
+                                <td>UGX {{ payment.amount|floatformat:2 }}</td>
+                                <td>{{ payment.payment_method|title }}</td>
+                                <td>{{ payment.payment_date }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">No payments found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

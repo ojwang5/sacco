@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card login-container shadow-lg border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; animation: fadeIn 1s ease-in;">
+                <div class="card-header text-white text-center" style="background: linear-gradient(90deg, #28a745 0%, #43c6ac 100%); border-radius: 20px 20px 0 0 !important;">
+                    <h4 class="mb-0 fw-bold">Superuser Login</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if form.errors %}
+                        <div class="alert alert-danger" style="background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 10px;">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <form method="post" action="{% url 'admin:login' %}">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="id_username" class="form-label text-white fw-bold">Username</label>
+                            <input type="text" name="username" autofocus required class="form-control form-control-lg" id="id_username" style="background: rgba(255,255,255,0.9); border: none; border-radius: 10px; transition: all 0.3s ease;">
+                        </div>
+                        <div class="mb-4">
+                            <label for="id_password" class="form-label text-white fw-bold">Password</label>
+                            <input type="password" name="password" required class="form-control form-control-lg" id="id_password" style="background: rgba(255,255,255,0.9); border: none; border-radius: 10px; transition: all 0.3s ease;">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold" style="background: linear-gradient(90deg, #28a745 0%, #43c6ac 100%); border: none; border-radius: 10px; transition: all 0.3s ease;">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.login-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.form-control:focus {
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+    border-color: #28a745;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'sacco/base.html' %}
+{% block title %}Withdrawals{% endblock %}
+{% block content %}
+<section class="mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+    <div>
+        <h2 class="mb-1">Withdrawals</h2>
+        <p class="text-muted">Monitor and manage withdrawal applications from members.</p>
+    </div>
+    <div>
+        <div class="btn-group me-2" role="group">
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'withdrawals' 'csv' %}">CSV</a></li>
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'withdrawals' 'pdf' %}">PDF</a></li>
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'withdrawals' 'excel' %}">Excel</a></li>
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'withdrawals' 'docx' %}">Word</a></li>
+            </ul>
+        </div>
+        <a class="btn btn-success me-2" href="{% url 'sacco:add_withdrawal' %}">Add Withdrawal</a>
+        <a class="btn btn-outline-secondary" href="{% url 'sacco:dashboard' %}">Back to dashboard</a>
+    </div>
+</section>
+<div class="card card-modern p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Withdrawal ID</th>
+                    <th>Member</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Application Date</th>
+                    <th>Approval Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for withdrawal in withdrawals %}
+                <tr>
+                    <td>{{ withdrawal.withdrawal_id }}</td>
+                    <td>{{ withdrawal.member.name }}</td>
+                    <td>UGX {{ withdrawal.amount|floatformat:2 }}</td>
+                    <td>
+                        {% if withdrawal.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% elif withdrawal.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                        {% elif withdrawal.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ withdrawal.application_date }}</td>
+                    <td>{{ withdrawal.approval_date|default:"-" }}</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'sacco:edit_withdrawal' withdrawal.withdrawal_id %}">Edit</a>
+                        <a class="btn btn-sm btn-outline-danger" href="{% url 'sacco:delete_withdrawal' withdrawal.withdrawal_id %}">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7">No withdrawals found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

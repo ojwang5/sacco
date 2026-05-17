@@ -1,0 +1,217 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Notification Details{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Notification Details -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">{{ notification.title }}</h5>
+                            <small>{{ notification.get_notification_type_display }}</small>
+                        </div>
+                        <div>
+                            {% if notification.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif notification.status == 'read' %}
+                                <span class="badge bg-info">Read</span>
+                            {% else %}
+                                <span class="badge bg-success">Resolved</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>From:</strong> {{ notification.member.name }} ({{ notification.member.phone }})
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <strong>Date:</strong> {{ notification.created_at|date:"M d, Y H:i" }}
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-light border">
+                        <h6>Message:</h6>
+                        <p>{{ notification.message }}</p>
+                    </div>
+
+                    <!-- Related Object Details -->
+                    {% if notification.loan %}
+                    <div class="card mt-3 bg-light">
+                        <div class="card-header">
+                            <h6 class="mb-0">Loan Application Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Loan ID:</strong> {{ notification.loan.loan_id }}</p>
+                            <p><strong>Amount:</strong> UGX {{ notification.loan.amount|floatformat:2 }}</p>
+                            <p><strong>Interest Rate:</strong> {{ notification.loan.interest_rate }}%</p>
+                            <p><strong>Term:</strong> {{ notification.loan.term_months }} months</p>
+                            <p><strong>Purpose:</strong> {{ notification.loan.purpose }}</p>
+                            <p><strong>Status:</strong>
+                                <span class="badge 
+                                    {% if notification.loan.status == 'pending' %}bg-warning text-dark
+                                    {% elif notification.loan.status == 'approved' %}bg-success
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ notification.loan.get_status_display }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if notification.withdrawal %}
+                    <div class="card mt-3 bg-light">
+                        <div class="card-header">
+                            <h6 class="mb-0">Withdrawal Application Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Withdrawal ID:</strong> {{ notification.withdrawal.withdrawal_id }}</p>
+                            <p><strong>Amount:</strong> UGX {{ notification.withdrawal.amount|floatformat:2 }}</p>
+                            <p><strong>Purpose:</strong> {{ notification.withdrawal.purpose }}</p>
+                            <p><strong>Payment Method:</strong> {{ notification.withdrawal.get_payment_method_display }}</p>
+                            <p><strong>Status:</strong>
+                                <span class="badge 
+                                    {% if notification.withdrawal.status == 'pending' %}bg-warning text-dark
+                                    {% elif notification.withdrawal.status == 'approved' %}bg-success
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ notification.withdrawal.get_status_display }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <a href="{% url 'sacco:notifications_list' %}" class="btn btn-secondary">Back to Notifications</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Replies Section -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Comments & Replies ({{ replies.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if replies %}
+                    <div class="comments-section" style="max-height: 400px; overflow-y: auto;">
+                        {% for reply in replies %}
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ reply.admin_user.first_name|default:reply.admin_user.username }} (Admin)</strong>
+                                    <small class="text-muted">{{ reply.created_at|date:"M d, Y H:i" }}</small>
+                                </div>
+                                {% if reply.is_internal %}
+                                <small class="text-danger"><i class="fas fa-lock"></i> Internal Note (Only for admins)</small>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                {{ reply.reply_message|linebreaks }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No replies yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Admin Reply Form -->
+            {% if is_admin %}
+            <div class="card mt-4 shadow-sm border-primary">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Add Reply (Admin)</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="replyMessage" class="form-label">Reply Message:</label>
+                            <textarea class="form-control" id="replyMessage" name="reply_message" rows="5" required></textarea>
+                            <small class="form-text text-muted">Your reply will be visible to the member.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isInternal" name="is_internal" value="on">
+                                <label class="form-check-label" for="isInternal">
+                                    Mark as internal note (only visible to admins)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="markResolved" name="mark_resolved" value="on">
+                                <label class="form-check-label" for="markResolved">
+                                    Mark as resolved after replying
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success me-2">Send Reply</button>
+                        <a href="{% url 'sacco:notifications_list' %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar Info -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h6 class="mb-0">Member Information</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ notification.member.name }}</p>
+                    <p><strong>Phone:</strong> {{ notification.member.phone }}</p>
+                    <p><strong>Email:</strong> {{ notification.member.email|default:"N/A" }}</p>
+                    <p><strong>Member ID:</strong> {{ notification.member.member_id }}</p>
+                    <p><strong>Join Date:</strong> {{ notification.member.join_date|date:"M d, Y" }}</p>
+                    
+                    {% if is_admin %}
+                    <div class="mt-3">
+                        <a href="{% url 'sacco:edit_member' notification.member.member_id %}" class="btn btn-sm btn-outline-primary w-100">
+                            Edit Member
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h6 class="mb-0">Notification Actions</h6>
+                </div>
+                <div class="card-body">
+                    {% if is_admin and notification.status != 'resolved' %}
+                    <a href="{% url 'sacco:mark_notification_resolved' notification.notification_id %}" class="btn btn-success w-100 mb-2">
+                        Mark as Resolved
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'sacco:notifications_list' %}" class="btn btn-outline-secondary w-100">
+                        Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.comments-section {
+    border: 1px solid #e3e6f0;
+    border-radius: 0.35rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}

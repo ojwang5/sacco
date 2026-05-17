@@ -1,0 +1,53 @@
+{% extends 'sacco/base.html' %}
+{% block title %}Members{% endblock %}
+{% block content %}
+<section class="mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+    <div>
+        <h2 class="mb-1">Members</h2>
+        <p class="text-muted">Manage your member directory with quick actions and a clean table layout.</p>
+    </div>
+    <div>
+        <a class="btn btn-success me-2" href="{% url 'sacco:add_member' %}">Add Member</a>
+        <a class="btn btn-outline-secondary" href="{% url 'sacco:dashboard' %}">Back to dashboard</a>
+    </div>
+</section>
+<div class="card card-modern p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle"> 
+  <thead>
+    <tr>
+      <th>Member ID</th>
+      <th>Name</th>
+      <th>ID Number</th>
+      <th>Phone</th>
+      <th>Email</th>
+      <th>Join Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for m in members %}
+    <tr>
+      <td>{{ m.member_id }}</td>
+      <td>{{ m.name }}</td>
+      <td>{{ m.id_number }}</td>
+      <td>{{ m.phone }}</td>
+      <td>{{ m.email }}</td>
+      <td>{{ m.join_date }}</td>
+      <td>
+        {% if m.pk %}
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'sacco:edit_member' m.pk %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'sacco:delete_member' m.pk %}">Delete</a>
+        {% else %}
+          <span class="text-muted small">No actions</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">No members found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+    </div>
+</div>
+{% endblock %}

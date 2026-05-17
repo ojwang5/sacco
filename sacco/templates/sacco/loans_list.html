@@ -1,0 +1,74 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Loans - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Loans</h1>
+            <button class="btn btn-primary">Apply for Loan</button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Loan ID</th>
+                                <th>Member</th>
+                                <th>Amount</th>
+                                <th>Interest Rate</th>
+                                <th>Term</th>
+                                <th>Status</th>
+                                <th>Application Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in loans %}
+                            <tr>
+                                <td>{{ loan.loan_id }}</td>
+                                <td>{{ loan.member.name }}</td>
+                                <td>UGX {{ loan.amount|floatformat:2 }}</td>
+                                <td>{{ loan.interest_rate }}%</td>
+                                <td>{{ loan.term_months }} months</td>
+                                <td>
+                                    <span class="badge bg-{% if loan.status == 'approved' %}success{% elif loan.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                        {{ loan.status|title }}
+                                    </span>
+                                </td>
+                                <td>{{ loan.application_date }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info">View</button>
+                                    <a href="{% url 'sacco:edit_loan' loan.loan_id %}" class="btn btn-sm btn-warning">Edit</a>
+                                    <form method="post" action="{% url 'sacco:delete_loan' loan.loan_id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this loan?')">Delete</button>
+                                    </form>
+                                    {% if loan.status == 'pending' %}
+                                    <a href="{% url 'sacco:approve_loan' loan.pk %}" class="btn btn-sm btn-success" onclick="return confirm('Approve this loan?')">Approve</a>
+                                    <a href="{% url 'sacco:reject_loan' loan.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Reject this loan?')">Reject</a>
+                                    {% elif loan.status == 'approved' %}
+                                    <a href="{% url 'sacco:make_payment' %}" class="btn btn-sm btn-primary">Make Payment</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center">No loans found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

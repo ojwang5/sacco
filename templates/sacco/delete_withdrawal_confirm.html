@@ -1,0 +1,33 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Delete Withdrawal{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5>Confirm Delete Withdrawal</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-danger"><strong>Warning:</strong> This action cannot be undone!</p>
+                    <p>Are you sure you want to delete the following withdrawal?</p>
+                    <div class="alert alert-info">
+                        <strong>Withdrawal #{{ withdrawal.withdrawal_id }}</strong><br>
+                        Member: {{ withdrawal.member.name }}<br>
+                        Amount: UGX {{ withdrawal.amount }}<br>
+                        Status: {{ withdrawal.status|upper }}<br>
+                        Date: {{ withdrawal.application_date }}
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Yes, Delete Withdrawal</button>
+                        <a href="{% url 'sacco:withdrawals_list' %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

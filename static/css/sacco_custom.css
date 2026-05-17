@@ -1,0 +1,98 @@
+/* Modern Sacco app theme */
+:root {
+  --primary: #0066cc;
+  --primary-alt: #004b9a;
+  --secondary: #00a79d;
+  --bg: #f1f4fb;
+  --card-bg: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+.navbar {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: white !important;
+}
+
+.navbar .nav-link {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.card-modern {
+  background: var(--card-bg);
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(46, 61, 97, 0.12);
+}
+
+.section-hero {
+  padding: 3.5rem 1rem;
+  background-image: linear-gradient(135deg, rgba(0, 102, 204, 0.95), rgba(0, 167, 157, 0.95));
+  color: white;
+  border-radius: 1rem;
+}
+
+.section-hero h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+}
+
+.section-hero p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.card-shortcut {
+  border-radius: 1rem;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.card-shortcut:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.18);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-alt);
+  border-color: var(--primary-alt);
+}
+
+.profile-card {
+  border-left: 4px solid var(--secondary);
+  padding: 1.2rem;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.table thead {
+  background: #f2f6ff;
+}
+
+.table tbody tr:hover {
+  background: #f9fbff;
+}
+
+.btn-outline-secondary,
+.btn-outline-primary {
+  border-radius: 999px;
+}
+
+.footer-note {
+  font-size: 0.85rem;
+  color: var(--muted);
+}

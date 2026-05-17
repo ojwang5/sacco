@@ -1,0 +1,152 @@
+{% extends 'sacco/base.html' %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mb-4">Reports</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <a href="{% url 'sacco:members_list' %}" class="text-decoration-none">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Members</h5>
+                    <h2>{{ total_members }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:savings_list' %}" class="text-decoration-none">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Savings</h5>
+                    <h2>UGX {{ total_savings|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:loans_list' %}" class="text-decoration-none">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Loans Given Out</h5>
+                    <h2>UGX {{ total_loans_given_out|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:loans_list' %}" class="text-decoration-none">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Loans</h5>
+                    <h6>Count: {{ pending_loans }}</h6>
+                    <h6>Amount: UGX {{ pending_loans_amount|floatformat:2 }}</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <p>Generate and view additional Sacco reports here.</p>
+    </div>
+</div>
+
+<!-- Export Modules Section -->
+<div class="row">
+    <!-- Members Export -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>Members Report</h5>
+            </div>
+            <div class="card-body">
+                <p>Export members data in various formats:</p>
+                <div class="btn-group" role="group" aria-label="Members Export">
+                    <a href="{% url 'sacco:export_data' 'members' 'csv' %}" class="btn btn-sm btn-outline-primary">CSV</a>
+                    <a href="{% url 'sacco:export_data' 'members' 'pdf' %}" class="btn btn-sm btn-outline-primary">PDF</a>
+                    <a href="{% url 'sacco:export_data' 'members' 'excel' %}" class="btn btn-sm btn-outline-primary">Excel</a>
+                    <a href="{% url 'sacco:export_data' 'members' 'docx' %}" class="btn btn-sm btn-outline-primary">Word</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Savings Export -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5>Savings Report</h5>
+            </div>
+            <div class="card-body">
+                <p>Export savings transactions in various formats:</p>
+                <div class="btn-group" role="group" aria-label="Savings Export">
+                    <a href="{% url 'sacco:export_data' 'savings' 'csv' %}" class="btn btn-sm btn-outline-success">CSV</a>
+                    <a href="{% url 'sacco:export_data' 'savings' 'pdf' %}" class="btn btn-sm btn-outline-success">PDF</a>
+                    <a href="{% url 'sacco:export_data' 'savings' 'excel' %}" class="btn btn-sm btn-outline-success">Excel</a>
+                    <a href="{% url 'sacco:export_data' 'savings' 'docx' %}" class="btn btn-sm btn-outline-success">Word</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loans Export -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5>Loans Report</h5>
+            </div>
+            <div class="card-body">
+                <p>Export loans data in various formats:</p>
+                <div class="btn-group" role="group" aria-label="Loans Export">
+                    <a href="{% url 'sacco:export_data' 'loans' 'csv' %}" class="btn btn-sm btn-outline-warning">CSV</a>
+                    <a href="{% url 'sacco:export_data' 'loans' 'pdf' %}" class="btn btn-sm btn-outline-warning">PDF</a>
+                    <a href="{% url 'sacco:export_data' 'loans' 'excel' %}" class="btn btn-sm btn-outline-warning">Excel</a>
+                    <a href="{% url 'sacco:export_data' 'loans' 'docx' %}" class="btn btn-sm btn-outline-warning">Word</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments Export -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5>Payments Report</h5>
+            </div>
+            <div class="card-body">
+                <p>Export payments data in various formats:</p>
+                <div class="btn-group" role="group" aria-label="Payments Export">
+                    <a href="{% url 'sacco:export_data' 'payments' 'csv' %}" class="btn btn-sm btn-outline-danger">CSV</a>
+                    <a href="{% url 'sacco:export_data' 'payments' 'pdf' %}" class="btn btn-sm btn-outline-danger">PDF</a>
+                    <a href="{% url 'sacco:export_data' 'payments' 'excel' %}" class="btn btn-sm btn-outline-danger">Excel</a>
+                    <a href="{% url 'sacco:export_data' 'payments' 'docx' %}" class="btn btn-sm btn-outline-danger">Word</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawals Export -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5>Withdrawals Report</h5>
+            </div>
+            <div class="card-body">
+                <p>Export withdrawals data in various formats:</p>
+                <div class="btn-group" role="group" aria-label="Withdrawals Export">
+                    <a href="{% url 'sacco:export_data' 'withdrawals' 'csv' %}" class="btn btn-sm btn-outline-info">CSV</a>
+                    <a href="{% url 'sacco:export_data' 'withdrawals' 'pdf' %}" class="btn btn-sm btn-outline-info">PDF</a>
+                    <a href="{% url 'sacco:export_data' 'withdrawals' 'excel' %}" class="btn btn-sm btn-outline-info">Excel</a>
+                    <a href="{% url 'sacco:export_data' 'withdrawals' 'docx' %}" class="btn btn-sm btn-outline-info">Word</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

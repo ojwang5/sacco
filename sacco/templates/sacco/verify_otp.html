@@ -1,0 +1,28 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Verify OTP - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: calc(100vh - 80px);">
+    <div class="card card-modern p-4" style="max-width: 420px; width: 100%;">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold">Verify OTP</h3>
+            <p class="text-muted">Enter the 6-digit code sent to {{ phone }}</p>
+        </div>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.otp_code.label_tag }}
+                {{ form.otp_code }}
+                {% if form.otp_code.errors %}
+                    <div class="text-danger small">{{ form.otp_code.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg w-100">Verify OTP</button>
+        </form>
+        <div class="text-center mt-3">
+            <a href="{% url 'sacco:forgot_password' %}" class="text-decoration-none">Didn't receive OTP? Try again</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

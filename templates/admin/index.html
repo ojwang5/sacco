@@ -1,0 +1,109 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div style="background: linear-gradient(135deg, #f8faff 0%, #e0eafc 100%); min-height: 100vh;">
+    <nav class="navbar navbar-expand-lg custom-navbar mb-4" style="background: linear-gradient(90deg, #3a6ea5 0%, #1273ea 100%); border-radius: 0 0 20px 20px;">
+        <div class="container-fluid">
+            <span class="navbar-brand text-white fw-bold fs-3">Sacco Management System</span>
+        </div>
+    </nav>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card custom-card shadow-lg border-0" style="border-radius: 24px; animation: fadeInUp 1s ease-in;">
+                    <div class="card-body p-5" style="background: #fff; border-radius: 24px;">
+                        <div class="text-center mb-5">
+                            <h1 class="display-4 fw-bold mb-3 welcome-title">Welcome to the Sacco Admin Dashboard</h1>
+                            <p class="lead" style="color: #495057; font-weight: 500;">Manage members, loans, and savings with ease.</p>
+                        </div>
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow custom-card" style="border-radius: 20px; transition: all 0.3s ease; animation: fadeInUp 1.2s ease-in;">
+                                    <div class="card-header text-white custom-card-header" style="background: linear-gradient(90deg, #1273ea 0%, #28a745 100%); border-radius: 20px 20px 0 0 !important;">
+                                        <h5 class="mb-0 fw-bold">Members</h5>
+                                    </div>
+                                    <div class="card-body text-center p-4">
+                                        <p class="card-text mb-4" style="color: #6c757d;">View and manage members.</p>
+                                        <a href="/admin/sacco/member/" class="btn btn-outline-primary w-100 custom-btn fw-bold" style="border-radius: 10px; padding: 12px; transition: all 0.3s ease;">Members List</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow custom-card" style="border-radius: 20px; transition: all 0.3s ease; animation: fadeInUp 1.4s ease-in;">
+                                    <div class="card-header text-white custom-card-header" style="background: linear-gradient(90deg, #28a745 0%, #43c6ac 100%); border-radius: 20px 20px 0 0 !important;">
+                                        <h5 class="mb-0 fw-bold">Loans</h5>
+                                    </div>
+                                    <div class="card-body text-center p-4">
+                                        <p class="card-text mb-4" style="color: #6c757d;">View and manage loans.</p>
+                                        <a href="/admin/sacco/loan/" class="btn btn-outline-success w-100 custom-btn fw-bold" style="border-radius: 10px; padding: 12px; transition: all 0.3s ease;">Loans List</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-0 shadow custom-card" style="border-radius: 20px; transition: all 0.3s ease; animation: fadeInUp 1.6s ease-in;">
+                                    <div class="card-header text-white custom-card-header" style="background: linear-gradient(90deg, #17a2b8 0%, #764ba2 100%); border-radius: 20px 20px 0 0 !important;">
+                                        <h5 class="mb-0 fw-bold">Savings</h5>
+                                    </div>
+                                    <div class="card-body text-center p-4">
+                                        <p class="card-text mb-4" style="color: #6c757d;">View and manage savings.</p>
+                                        <a href="/admin/sacco/savings/" class="btn btn-outline-info w-100 custom-btn fw-bold" style="border-radius: 10px; padding: 12px; transition: all 0.3s ease;">Savings List</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-5 text-center">
+                            <a href="/admin/" class="custom-link fw-bold" style="color: #1273ea; text-decoration: none; padding: 12px 24px; border: 2px solid #1273ea; border-radius: 10px; transition: all 0.3s ease;">Go to Admin Home</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12">
+                {{ block.super }}
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.custom-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+}
+
+.custom-link:hover {
+    background: #1273ea;
+    color: white !important;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(18, 115, 234, 0.3);
+}
+
+.welcome-title {
+    background: linear-gradient(90deg, #1273ea 0%, #28a745 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    .col-md-4 {
+        margin-bottom: 20px;
+    }
+}
+</style>
+{% endblock %}

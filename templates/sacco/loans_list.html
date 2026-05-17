@@ -1,0 +1,80 @@
+{% extends 'sacco/base.html' %}
+{% block title %}Loans{% endblock %}
+{% block content %}
+<section class="mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+    <div>
+        <h2 class="mb-1">Loans</h2>
+        <p class="text-muted">Create, track and manage loan applications in one place.</p>
+    </div>
+    <div>
+        <div class="btn-group me-2" role="group">
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'loans' 'csv' %}">CSV</a></li>
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'loans' 'pdf' %}">PDF</a></li>
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'loans' 'excel' %}">Excel</a></li>
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'loans' 'docx' %}">Word</a></li>
+            </ul>
+        </div>
+        <a class="btn btn-success me-2" href="{% url 'sacco:add_loan' %}">Add Loan</a>
+        <a class="btn btn-outline-secondary" href="{% url 'sacco:dashboard' %}">Back to dashboard</a>
+    </div>
+</section>
+<div class="card card-modern p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+  <thead>
+    <tr>
+      <th>Loan ID</th>
+      <th>Member</th>
+      <th>Amount</th>
+      <th>Interest</th>
+      <th>Term</th>
+      <th>Status</th>
+      <th>Applied</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for loan in loans %}
+    <tr class="{% if loan.status == 'pending' %}table-warning{% elif loan.status == 'approved' %}table-success{% elif loan.status == 'rejected' %}table-danger{% endif %}">
+      <td><strong>#{{ loan.loan_id }}</strong></td>
+      <td>{{ loan.member.name }}</td>
+      <td>UGX {{ loan.amount|floatformat:0 }}</td>
+      <td>{{ loan.interest_rate }}%</td>
+      <td>{{ loan.term_months }} months</td>
+      <td>
+        {% if loan.status == 'pending' %}
+          <span class="badge bg-warning text-dark">Pending</span>
+        {% elif loan.status == 'approved' %}
+          <span class="badge bg-success">Approved</span>
+        {% elif loan.status == 'rejected' %}
+          <span class="badge bg-danger">Rejected</span>
+        {% endif %}
+      </td>
+      <td><small>{{ loan.application_date|date:"M d, Y" }}</small></td>
+      <td>
+        {% if loan.pk %}
+          <div class="btn-group btn-group-sm" role="group">
+            <a class="btn btn-outline-primary" href="{% url 'sacco:edit_loan' loan.pk %}" title="Edit">Edit</a>
+            {% if loan.status == 'pending' %}
+              <a class="btn btn-success" href="{% url 'sacco:approve_loan' loan.pk %}" title="Approve"><i class="fas fa-check"></i> Approve</a>
+              <a class="btn btn-danger" href="{% url 'sacco:reject_loan' loan.pk %}" title="Reject"><i class="fas fa-times"></i> Reject</a>
+            {% endif %}
+            <a class="btn btn-outline-danger" href="{% url 'sacco:delete_loan' loan.pk %}" title="Delete">Delete</a>
+          </div>
+        {% else %}
+          <span class="text-muted small">No actions</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="8" class="text-center text-muted">No loans found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+    </div>
+</div>
+{% endblock %}

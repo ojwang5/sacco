@@ -1,0 +1,198 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Member Dashboard - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        {% if error %}
+            <div class="alert alert-danger">
+                <h4>Error</h4>
+                <p>{{ error }}</p>
+                <p>Please contact the administrator to set up your member profile.</p>
+            </div>
+        {% else %}
+            <h1 class="mb-4">Welcome, {{ member.name|default:member.user.username }}!</h1>
+        {% endif %}
+    </div>
+</div>
+
+{% if not error %}
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card card-modern text-center">
+            <div class="card-body">
+                <h5 class="card-title text-primary">Total Savings</h5>
+                <h2 class="card-text">UGX {{ member_savings|floatformat:2 }}</h2>
+                <p class="text-muted">Your current savings balance</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-modern text-center">
+            <div class="card-body">
+                <h5 class="card-title text-success">Loan Balance</h5>
+                <h2 class="card-text">UGX {{ user_loan_balance|floatformat:2 }}</h2>
+                <p class="text-muted">Outstanding loan amount</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-modern text-center">
+            <div class="card-body">
+                <h5 class="card-title text-warning">Pending Loans</h5>
+                <h2 class="card-text">{{ user_pending_loans }}</h2>
+                <p class="text-muted">Loan applications pending</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card card-modern">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{% url 'sacco:apply_loan' %}" class="btn btn-primary btn-lg w-100 mb-2">
+                            <i class="fas fa-plus-circle"></i> Apply For Loan
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'sacco:make_payment' %}" class="btn btn-success btn-lg w-100 mb-2">
+                            <i class="fas fa-credit-card"></i> Make Payment
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'sacco:add_savings' %}" class="btn btn-info btn-lg w-100 mb-2">
+                            <i class="fas fa-piggy-bank"></i> Add Savings
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'sacco:savings_list' %}" class="btn btn-secondary btn-lg w-100 mb-2">
+                            <i class="fas fa-history"></i> View Savings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities -->
+<div class="row">
+    <div class="col-12">
+        <div class="card card-modern">
+            <div class="card-header">
+                <h5>Recent Activities</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in recent_activities %}
+                            <tr>
+                                {% if activity.transaction_type %}
+                                    <!-- Savings activity -->
+                                    <td>
+                                        <span class="badge bg-{% if activity.transaction_type == 'deposit' %}success{% else %}danger{% endif %}">
+                                            {{ activity.transaction_type|title }}
+                                        </span>
+                                    </td>
+                                    <td>Savings {{ activity.transaction_type }}</td>
+                                    <td>UGX {{ activity.amount|floatformat:2 }}</td>
+                                    <td>{{ activity.transaction_date|date:"M d, Y" }}</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                {% else %}
+                                    <!-- Loan activity -->
+                                    <td>
+                                        <span class="badge bg-primary">Loan</span>
+                                    </td>
+                                    <td>Loan Application</td>
+                                    <td>UGX {{ activity.amount|floatformat:2 }}</td>
+                                    <td>{{ activity.application_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if activity.status == 'approved' %}success{% elif activity.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                            {{ activity.status|title }}
+                                        </span>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No recent activities</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- My Loans Summary -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card card-modern">
+            <div class="card-header">
+                <h5>My Loans</h5>
+            </div>
+            <div class="card-body">
+                {% if member_loans %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Loan ID</th>
+                                <th>Amount</th>
+                                <th>Interest Rate</th>
+                                <th>Term</th>
+                                <th>Status</th>
+                                <th>Application Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in member_loans %}
+                            <tr>
+                                <td>{{ loan.loan_id }}</td>
+                                <td>UGX {{ loan.amount|floatformat:2 }}</td>
+                                <td>{{ loan.interest_rate }}%</td>
+                                <td>{{ loan.term_months }} months</td>
+                                <td>
+                                    <span class="badge bg-{% if loan.status == 'approved' %}success{% elif loan.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                        {{ loan.status|title }}
+                                    </span>
+                                </td>
+                                <td>{{ loan.application_date|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center text-muted">You haven't applied for any loans yet.</p>
+                <div class="text-center">
+                    <a href="{% url 'sacco:apply_loan' %}" class="btn btn-primary">Apply for Your First Loan</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

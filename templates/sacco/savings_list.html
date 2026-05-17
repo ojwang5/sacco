@@ -1,0 +1,62 @@
+{% extends 'sacco/base.html' %}
+{% block title %}Savings{% endblock %}
+{% block content %}
+<section class="mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+    <div>
+        <h2 class="mb-1">Savings</h2>
+        <p class="text-muted">Record deposits and withdrawals for members with clear tracking.</p>
+    </div>
+    <div>
+        <div class="btn-group me-2" role="group">
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'savings' 'csv' %}">CSV</a></li>
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'savings' 'pdf' %}">PDF</a></li>
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'savings' 'excel' %}">Excel</a></li>
+                <li><a class="dropdown-item" href="{% url 'sacco:export_data' 'savings' 'docx' %}">Word</a></li>
+            </ul>
+        </div>
+        <a class="btn btn-success me-2" href="{% url 'sacco:add_savings' %}">Add Savings</a>
+        <a class="btn btn-outline-secondary" href="{% url 'sacco:dashboard' %}">Back to dashboard</a>
+    </div>
+</section>
+<div class="card card-modern p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+  <thead>
+    <tr>
+      <th>Transaction ID</th>
+      <th>Member</th>
+      <th>Type</th>
+      <th>Amount</th>
+      <th>Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in savings %}
+    <tr>
+      <td>{{ s.transaction_id }}</td>
+      <td>{{ s.member.name }}</td>
+      <td>{{ s.transaction_type }}</td>
+      <td>{{ s.amount }}</td>
+      <td>{{ s.transaction_date }}</td>
+      <td>
+        {% if s.pk %}
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'sacco:edit_savings' s.pk %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'sacco:delete_savings' s.pk %}">Delete</a>
+        {% else %}
+          <span class="text-muted small">No actions</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">No savings found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Dashboard - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Dashboard</h1>
+            <a href="{% url 'sacco:make_payment' %}" class="btn btn-primary">Make Payment</a>
+        </div>
+    </div>
+</div>
+
+<!-- Report Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <a href="{% url 'sacco:members_list' %}" class="text-decoration-none">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Members</h5>
+                    <h2>{{ total_members }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:savings_list' %}" class="text-decoration-none">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Savings</h5>
+                    <h2>UGX {{ total_savings|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:loans_list' %}" class="text-decoration-none">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Loans Given Out</h5>
+                    <h2>UGX {{ total_loans_given_out|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:loans_list' %}" class="text-decoration-none">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Loans</h5>
+                    <h6>Count: {{ pending_loans }}</h6>
+                    <h6>Amount: UGX {{ pending_loans_amount|floatformat:2 }}</h6>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Savings</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for saving in recent_savings %}
+                            <tr>
+                                <td>{{ saving.member.name }}</td>
+                                <td>UGX {{ saving.amount|floatformat:2 }}</td>
+                                <td>{{ saving.transaction_type|title }}</td>
+                                <td>{{ saving.transaction_date }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No recent savings</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Loans</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in recent_loans %}
+                            <tr>
+                                <td>{{ loan.member.name }}</td>
+                                <td>UGX {{ loan.amount|floatformat:2 }}</td>
+                                <td>{{ loan.status|title }}</td>
+                                <td>{{ loan.application_date }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No recent loans</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

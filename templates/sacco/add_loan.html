@@ -1,0 +1,64 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Add Loan{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="mb-4">Add New Loan</h2>
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="{{ form.member.id_for_label }}" class="form-label">Member *</label>
+                            {{ form.member }}
+                            {% if form.member.errors %}
+                                <div class="text-danger small mt-1">{{ form.member.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.amount.id_for_label }}" class="form-label">Amount *</label>
+                            {{ form.amount }}
+                            {% if form.amount.errors %}
+                                <div class="text-danger small mt-1">{{ form.amount.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.interest_rate.id_for_label }}" class="form-label">Interest Rate (%) *</label>
+                            {{ form.interest_rate }}
+                            {% if form.interest_rate.errors %}
+                                <div class="text-danger small mt-1">{{ form.interest_rate.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.term_months.id_for_label }}" class="form-label">Term (Months) *</label>
+                            {{ form.term_months }}
+                            {% if form.term_months.errors %}
+                                <div class="text-danger small mt-1">{{ form.term_months.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.purpose.id_for_label }}" class="form-label">Purpose *</label>
+                            {{ form.purpose }}
+                            {% if form.purpose.errors %}
+                                <div class="text-danger small mt-1">{{ form.purpose.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">Add Loan</button>
+                            <a href="{% url 'sacco:loans_list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

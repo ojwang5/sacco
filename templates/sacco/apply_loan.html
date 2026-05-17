@@ -1,0 +1,248 @@
+{% extends 'sacco/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Loan Management</h2>
+    
+    <!-- Loan Summary Section -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Total Approved Loans</h6>
+                    <h4>UGX {{ approved_loans_amount|floatformat:0 }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Loan Balance</h6>
+                    <h4>UGX {{ loan_balance|floatformat:0 }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Active Loans</h6>
+                    <h4>{{ member_loans|length }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Pending Applications</h6>
+                    <h4>{{ pending_loans }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Your Loans Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5>Your Loans</h5>
+        </div>
+        <div class="card-body">
+            {% if member_loans %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Loan ID</th>
+                        <th>Amount</th>
+                        <th>Interest Rate</th>
+                        <th>Term (Months)</th>
+                        <th>Status</th>
+                        <th>Applied Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in member_loans %}
+                    <tr>
+                        <td>#{{ loan.loan_id }}</td>
+                        <td>UGX {{ loan.amount|floatformat:0 }}</td>
+                        <td>{{ loan.interest_rate }}%</td>
+                        <td>{{ loan.term_months }}</td>
+                        <td>
+                            {% if loan.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                            {% elif loan.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                            {% elif loan.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ loan.application_date|date:"M d, Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">No loans yet. Apply for your first loan below!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Loan Payment Progress Section (for approved loans) -->
+    {% if has_approved_loans %}
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5>Loan Payment Progress</h5>
+        </div>
+        <div class="card-body">
+            {% for progress in loan_progress_details %}
+            <div class="mb-4 pb-3 border-bottom">
+                <div class="row mb-2">
+                    <div class="col-md-8">
+                        <h6 class="mb-2">
+                            Loan #{{ progress.loan.loan_id }} - {{ progress.loan.purpose }}
+                        </h6>
+                        <p class="small text-muted mb-1">
+                            <strong>Principal Amount:</strong> UGX {{ progress.principal_amount|floatformat:0 }}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="badge bg-info">{{ progress.total_payments }} Payments Made</span>
+                    </div>
+                </div>
+                
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <p class="small"><strong>Amount Paid:</strong> UGX {{ progress.amount_paid|floatformat:0 }}</p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <p class="small"><strong>Remaining Balance:</strong> UGX {{ progress.remaining_balance|floatformat:0 }}</p>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="progress mb-2" style="height: 25px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: {{ progress.payment_percentage }}%;" 
+                         aria-valuenow="{{ progress.payment_percentage }}" 
+                         aria-valuemin="0" aria-valuemax="100">
+                        {{ progress.payment_percentage }}%
+                    </div>
+                </div>
+                
+                <p class="small text-muted">
+                    Status: 
+                    {% if progress.payment_percentage >= 100 %}
+                    <span class="badge bg-success">Fully Paid</span>
+                    {% elif progress.payment_percentage >= 75 %}
+                    <span class="badge bg-info">Nearly Complete</span>
+                    {% elif progress.payment_percentage >= 50 %}
+                    <span class="badge bg-primary">Halfway</span>
+                    {% elif progress.payment_percentage > 0 %}
+                    <span class="badge bg-warning">In Progress</span>
+                    {% else %}
+                    <span class="badge bg-danger">Not Started</span>
+                    {% endif %}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Apply for New Loan Section (Collapsible) -->
+    <div class="card border-success">
+        <div class="card-header bg-success text-white" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#loanFormCollapse">
+            <h5 class="mb-0">
+                <i class="bi bi-plus-circle"></i> Apply for a New Loan
+                <small class="float-end">(Click to expand)</small>
+            </h5>
+        </div>
+        <div class="collapse" id="loanFormCollapse">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="{{ form.amount.id_for_label }}" class="form-label">Loan Amount *</label>
+                        {{ form.amount }}
+                        {% if form.amount.errors %}
+                            <div class="text-danger small mt-1">{{ form.amount.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="{{ form.interest_rate.id_for_label }}" class="form-label">Interest Rate (%) *</label>
+                        {{ form.interest_rate }}
+                        {% if form.interest_rate.errors %}
+                            <div class="text-danger small mt-1">{{ form.interest_rate.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="{{ form.term_months.id_for_label }}" class="form-label">Loan Term (Months) *</label>
+                        {{ form.term_months }}
+                        {% if form.term_months.errors %}
+                            <div class="text-danger small mt-1">{{ form.term_months.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="{{ form.purpose.id_for_label }}" class="form-label">Purpose *</label>
+                        {{ form.purpose }}
+                        {% if form.purpose.errors %}
+                            <div class="text-danger small mt-1">{{ form.purpose.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    {% if form.guarantor1 %}
+                    <div class="form-group mb-3">
+                        <label for="{{ form.guarantor1.id_for_label }}" class="form-label">Guarantor 1</label>
+                        {{ form.guarantor1 }}
+                        {% if form.guarantor1.errors %}
+                            <div class="text-danger small mt-1">{{ form.guarantor1.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="{{ form.guarantor2.id_for_label }}" class="form-label">Guarantor 2</label>
+                        {{ form.guarantor2 }}
+                        {% if form.guarantor2.errors %}
+                            <div class="text-danger small mt-1">{{ form.guarantor2.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success">Submit Loan Application</button>
+                        <a href="{% url 'sacco:dashboard' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .progress {
+        background-color: #e9ecef;
+    }
+    .progress-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-expand form if there are form errors
+        var formErrors = document.querySelectorAll('.text-danger');
+        if (formErrors.length > 0) {
+            var collapseElement = document.getElementById('loanFormCollapse');
+            if (collapseElement) {
+                var bsCollapse = new bootstrap.Collapse(collapseElement, {toggle: true});
+            }
+        }
+    });
+</script>
+
+{% endblock %}

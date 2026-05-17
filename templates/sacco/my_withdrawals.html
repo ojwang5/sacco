@@ -1,0 +1,71 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}My Withdrawals - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>My Withdrawals</h1>
+                <a href="{% url 'sacco:apply_withdrawal' %}" class="btn btn-primary">Apply for Withdrawal</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Withdrawal ID</th>
+                                    <th>Amount</th>
+                                    <th>Purpose</th>
+                                    <th>Status</th>
+                                    <th>Application Date</th>
+                                    <th>Approval Date</th>
+                                    <th>Payment Method</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for withdrawal in withdrawals %}
+                                <tr>
+                                    <td>{{ withdrawal.withdrawal_id }}</td>
+                                    <td>UGX {{ withdrawal.amount|floatformat:2 }}</td>
+                                    <td>{{ withdrawal.purpose }}</td>
+                                    <td>
+                                        {% if withdrawal.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif withdrawal.status == 'approved' %}
+                                            <span class="badge bg-success">Approved</span>
+                                        {% elif withdrawal.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ withdrawal.application_date }}</td>
+                                    <td>{{ withdrawal.approval_date|default:"-" }}</td>
+                                    <td>{{ withdrawal.get_payment_method_display }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No withdrawal applications found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <a href="{% url 'sacco:dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

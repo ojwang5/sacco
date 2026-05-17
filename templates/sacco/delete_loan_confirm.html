@@ -1,0 +1,32 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Delete Loan{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5>Confirm Delete Loan</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-danger"><strong>Warning:</strong> This action cannot be undone!</p>
+                    <p>Are you sure you want to delete the following loan?</p>
+                    <div class="alert alert-info">
+                        <strong>Loan #{{ loan.loan_id }}</strong><br>
+                        Member: {{ loan.member.name }}<br>
+                        Amount: UGX {{ loan.amount }}<br>
+                        Status: {{ loan.status|upper }}
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Yes, Delete Loan</button>
+                        <a href="{% url 'sacco:loans_list' %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
