@@ -10,8 +10,10 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 import csv
 import json
+
 import logging
 from django.core.mail import send_mail
 from django.conf import settings
@@ -956,10 +958,21 @@ def dashboard(request):
     deposits = Savings.objects.filter(transaction_type='deposit').aggregate(Sum('amount'))['amount__sum'] or 0
     withdrawals = Savings.objects.filter(transaction_type='withdrawal').aggregate(Sum('amount'))['amount__sum'] or 0
     total_savings = deposits - withdrawals
+    # Member activity counts: consider members with linked User and active flag as active
+    active_members = Member.objects.filter(user__is_active=True).count()
+    inactive_members = total_members - active_members
     total_loans_given_out = Loan.objects.filter(status='approved').aggregate(Sum('amount'))['amount__sum'] or 0
     pending_loans = Loan.objects.filter(status='pending').count()
     pending_loans_amount = Loan.objects.filter(status='pending').aggregate(Sum('amount'))['amount__sum'] or 0
     approved_loans = Loan.objects.filter(status='approved').count()
+    rejected_loans = Loan.objects.filter(status='rejected').count()
+    total_loans = Loan.objects.count()
+    # Withdrawals summary
+    total_withdrawals_amount = Withdrawal.objects.aggregate(total=Sum('amount'))['total'] or 0
+    pending_withdrawals_count = Withdrawal.objects.filter(status='pending').count()
+    approved_withdrawals_count = Withdrawal.objects.filter(status='approved').count()
+    rejected_withdrawals_count = Withdrawal.objects.filter(status='rejected').count()
+    total_withdrawals_count = Withdrawal.objects.count()
 
     # Calculate overdue loans
     overdue_loans = 0
@@ -1021,6 +1034,11 @@ def dashboard(request):
                 'user_loan_balance': user_loan_balance,
                 'user_pending_loans': user_pending_loans,
                 'recent_activities': recent_activities,
+
+                # Member presence statistics (for dashboards/widgets)
+                'total_members': total_members,
+                'active_members': active_members,
+                'inactive_members': inactive_members,
             }
         except Member.DoesNotExist:
             context = {'user_role': 'user', 'error': 'Member profile not found', 'recent_activities': []}
@@ -1036,20 +1054,38 @@ def dashboard(request):
         recent_activities.sort(key=lambda x: getattr(x, 'transaction_date', getattr(x, 'application_date', today)), reverse=True)
         recent_activities = recent_activities[:5]
 
+        # Superadmin-only: pending notifications count for dashboard widget
+        pending_count = 0
+        if user_role == 'superadmin':
+            pending_count = Notification.objects.filter(status='pending').count()
+
         context = {
             'user_role': user_role,
             'is_admin': True,
             'total_members': total_members,
+            'active_members': active_members,
+            'inactive_members': inactive_members,
+            'total_loans': total_loans,
             'total_savings': total_savings,
+            'deposits_total': deposits,
+            'withdrawals_total': withdrawals,
+            'total_withdrawals_amount': total_withdrawals_amount,
+            'total_withdrawals_count': total_withdrawals_count,
+            'pending_withdrawals_count': pending_withdrawals_count,
+            'approved_withdrawals_count': approved_withdrawals_count,
+            'rejected_withdrawals_count': rejected_withdrawals_count,
             'total_loans_given_out': total_loans_given_out,
             'pending_loans': pending_loans,
             'pending_loans_amount': pending_loans_amount,
             'approved_loans': approved_loans,
+            'rejected_loans': rejected_loans,
             'overdue_loans': overdue_loans,
+            'pending_count': pending_count,
             'recent_savings': recent_savings,
             'recent_loans': recent_loans,
             'recent_activities': recent_activities,
         }
+
     else:
         # Default fallback
         context = {'error': 'Role not recognized'}
@@ -1110,6 +1146,13 @@ def csrf_failure(request, reason=""):
     """Custom CSRF failure view"""
     logger.warning(f"CSRF failure: {reason}, User: {request.user}, Path: {request.path}")
     return render(request, 'sacco/csrf_failure.html', {'reason': reason})
+
+
+@login_required
+def loan_calculator(request):
+    """Render loan calculator page (frontend calls api_loan_calculator)."""
+    return render(request, 'sacco/loan_calculator.html')
+
 
 @user_required
 def apply_loan(request):
@@ -1691,6 +1734,7 @@ def settings_view(request):
 # ==================== API ENDPOINTS ====================
 
 @login_required
+@csrf_exempt
 def api_loan_calculator(request):
     """
     API endpoint for loan calculator
@@ -1699,31 +1743,33 @@ def api_loan_calculator(request):
     """
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
-            
+            # IMPORTANT: some browsers/clients may send JSON as bytes; request.body is safe.
+            data = json.loads(request.body.decode('utf-8') if isinstance(request.body, (bytes, bytearray)) else request.body)
+
             loan_amount = float(data.get('loan_amount', 0))
             interest_rate = float(data.get('interest_rate', 0))
             loan_term_months = int(data.get('loan_term_months', 0))
-            
+
+            # Validate inputs
             if loan_amount <= 0 or loan_term_months <= 0:
                 return JsonResponse({
                     'success': False,
                     'error': 'Loan amount and term must be greater than 0'
                 }, status=400)
-            
-            # Calculate monthly interest rate
+
+            # Monthly interest rate
             monthly_interest_rate = interest_rate / 100 / 12
-            
-            # Calculate monthly payment using amortization formula
+
+            # Amortization / EMI formula
             if monthly_interest_rate > 0:
                 compound = (1 + monthly_interest_rate) ** loan_term_months
                 monthly_payment = (loan_amount * monthly_interest_rate * compound) / (compound - 1)
             else:
                 monthly_payment = loan_amount / loan_term_months
-            
+
             total_repayment = monthly_payment * loan_term_months
             total_interest = total_repayment - loan_amount
-            
+
             return JsonResponse({
                 'success': True,
                 'monthly_payment': round(monthly_payment, 2),
@@ -1732,23 +1778,25 @@ def api_loan_calculator(request):
                 'loan_amount': loan_amount,
                 'interest_rate': interest_rate,
                 'loan_term_months': loan_term_months
-            })
-        
+            }, status=200)
+
         except json.JSONDecodeError:
             return JsonResponse({
                 'success': False,
                 'error': 'Invalid JSON format'
             }, status=400)
         except Exception as e:
+            # Include exception type for easier debugging
             return JsonResponse({
                 'success': False,
-                'error': str(e)
+                'error': f'{type(e).__name__}: {str(e)}'
             }, status=400)
-    
+
     return JsonResponse({
         'success': False,
         'error': 'Only POST requests are allowed'
     }, status=405)
+
 
 
 @login_required

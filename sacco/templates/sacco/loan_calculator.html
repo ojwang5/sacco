@@ -1,0 +1,138 @@
+{% extends 'sacco/base.html' %}
+
+{% block title %}Loan Calculator - SACCO Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 900px;">
+  <div class="card shadow rounded-4 border-0">
+    <div class="card-header bg-primary text-white rounded-top-4">
+      <div class="d-flex align-items-center gap-3">
+        <i class="fas fa-calculator fa-2x"></i>
+        <div>
+          <h4 class="mb-0">Loan Calculator</h4>
+          <small class="opacity-75">Get monthly repayment, total interest, and total repayment</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body p-4">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold" for="loan_amount">Loan Amount (UGX)</label>
+          <input id="loan_amount" type="number" class="form-control" min="0" step="0.01" placeholder="e.g. 1000000" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold" for="interest_rate">Interest Rate (%)</label>
+          <input id="interest_rate" type="number" class="form-control" min="0" step="0.01" placeholder="e.g. 12" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold" for="loan_term_months">Term (Months)</label>
+          <input id="loan_term_months" type="number" class="form-control" min="1" step="1" placeholder="e.g. 12" />
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 mt-4">
+        <button id="btn_calc" type="button" class="btn btn-primary rounded-3 px-4 py-2 fw-semibold">
+          <i class="fas fa-sync-alt me-2"></i>Calculate
+        </button>
+        <a class="btn btn-outline-secondary rounded-3 px-4 py-2 fw-semibold" href="{% url 'sacco:dashboard' %}">
+          Back to Dashboard
+        </a>
+      </div>
+
+      <div id="calc_alert" class="alert alert-info mt-4 d-none" role="alert"></div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-md-4">
+          <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="text-muted small">Monthly Payment</div>
+            <div id="out_monthly" class="fw-bold fs-4">—</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="text-muted small">Total Interest</div>
+            <div id="out_interest" class="fw-bold fs-4">—</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 border rounded-3 bg-light h-100">
+            <div class="text-muted small">Total Repayment</div>
+            <div id="out_total" class="fw-bold fs-4">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const apiUrl = "{% url 'sacco:api_loan_calculator' %}"; // /api/loan-calculator/
+
+    function showAlert(msg, kind) {
+      const el = document.getElementById('calc_alert');
+      el.classList.remove('d-none', 'alert-info', 'alert-danger');
+      el.classList.add(kind === 'error' ? 'alert-danger' : 'alert-info');
+      el.textContent = msg;
+    }
+
+    function setOutputs({ monthly_payment, total_interest, total_repayment }) {
+      document.getElementById('out_monthly').textContent = monthly_payment ?? '—';
+      document.getElementById('out_interest').textContent = total_interest ?? '—';
+      document.getElementById('out_total').textContent = total_repayment ?? '—';
+    }
+
+    document.getElementById('btn_calc').addEventListener('click', async function () {
+      const loan_amount = parseFloat(document.getElementById('loan_amount').value);
+      const interest_rate = parseFloat(document.getElementById('interest_rate').value);
+      const loan_term_months = parseInt(document.getElementById('loan_term_months').value, 10);
+
+      const payload = {
+        loan_amount: Number.isFinite(loan_amount) ? loan_amount : 0,
+        interest_rate: Number.isFinite(interest_rate) ? interest_rate : 0,
+        loan_term_months: Number.isFinite(loan_term_months) ? loan_term_months : 0,
+      };
+
+      // Clear outputs while calculating
+      setOutputs({ monthly_payment: '…', total_interest: '…', total_repayment: '…' });
+
+      try {
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // If user is authenticated, this is still safe; if not, server will redirect (fetch won't follow as HTML for JSON)
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify(payload),
+          credentials: 'same-origin'
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          showAlert(data.error || 'Loan calculation failed.', 'error');
+          setOutputs({ monthly_payment: '—', total_interest: '—', total_repayment: '—' });
+          return;
+        }
+
+        showAlert('Calculation successful.', 'info');
+        setOutputs({
+          monthly_payment: 'UGX ' + data.monthly_payment,
+          total_interest: 'UGX ' + data.total_interest,
+          total_repayment: 'UGX ' + data.total_repayment,
+        });
+      } catch (e) {
+        showAlert('Request failed. Please login and try again. Error: ' + String(e), 'error');
+        setOutputs({ monthly_payment: '—', total_interest: '—', total_repayment: '—' });
+      }
+    });
+
+    // Convert initial “—” to blank alert state
+    const out = document.getElementById('calc_alert');
+    if (out) out.classList.add('d-none');
+  })();
+</script>
+{% endblock %}
+

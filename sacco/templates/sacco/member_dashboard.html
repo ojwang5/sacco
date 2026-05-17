@@ -23,6 +23,36 @@
     <div class="col-md-4">
         <div class="card card-modern text-center">
             <div class="card-body">
+                <h5 class="card-title text-primary">Total Members</h5>
+                <h2 class="card-text">{{ total_members|default:0 }}</h2>
+                <p class="text-muted">All registered members</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-modern text-center">
+            <div class="card-body">
+                <h5 class="card-title text-success">Active Members</h5>
+                <h2 class="card-text">{{ active_members|default:0 }}</h2>
+                <p class="text-muted">User accounts enabled</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-modern text-center">
+            <div class="card-body">
+                <h5 class="card-title text-danger">Inactive Members</h5>
+                <h2 class="card-text">{{ inactive_members|default:0 }}</h2>
+                <p class="text-muted">User accounts disabled</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card card-modern text-center">
+            <div class="card-body">
                 <h5 class="card-title text-primary">Total Savings</h5>
                 <h2 class="card-text">UGX {{ member_savings|floatformat:2 }}</h2>
                 <p class="text-muted">Your current savings balance</p>
@@ -78,6 +108,12 @@
                             <i class="fas fa-history"></i> View Savings
                         </a>
                     </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'sacco:loan_calculator' %}" class="btn btn-warning btn-lg w-100 mb-2">
+                            <i class="fas fa-calculator"></i> Loan Calculator
+                        </a>
+                    </div>
+
                 </div>
             </div>
         </div>

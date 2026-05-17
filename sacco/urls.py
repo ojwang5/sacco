@@ -53,9 +53,13 @@ urlpatterns = [
     path('notifications/<int:notification_id>/', views.notification_detail, name='notification_detail'),
     path('notifications/<int:notification_id>/resolve/', views.mark_notification_resolved, name='mark_notification_resolved'),
 
+    # Calculator UI
+    path('loan-calculator/', views.loan_calculator, name='loan_calculator'),
+
     # API Endpoints
     path('api/loan-calculator/', views.api_loan_calculator, name='api_loan_calculator'),
     path('api/withdrawal-apply/', views.api_withdrawal_apply, name='api_withdrawal_apply'),
+
     path('api/loan/<int:loan_id>/status/', views.api_loan_status, name='api_loan_status'),
     path('api/loan/<int:loan_id>/approve/', views.api_loan_status_approve, name='api_loan_approve'),
     path('api/loan/<int:loan_id>/reject/', views.api_loan_status_reject, name='api_loan_reject'),

@@ -12,45 +12,139 @@
     </div>
 </div>
 
-<!-- Report Summary Cards -->
+<!-- Superadmin Statistics Cards -->
 <div class="row mb-4">
     <div class="col-md-3">
-        <a href="{% url 'sacco:members_list' %}" class="text-decoration-none">
-            <div class="card bg-primary text-white">
+        <div class="card bg-primary text-white text-center">
+            <div class="card-body">
+                <h5 class="card-title">Total Members</h5>
+                <h2 class="mb-0">{{ total_members }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-secondary text-white text-center">
+            <div class="card-body">
+                <h5 class="card-title">Active Members</h5>
+                <h2 class="mb-0">{{ active_members }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-dark text-white text-center">
+            <div class="card-body">
+                <h5 class="card-title">Inactive Members</h5>
+                <h2 class="mb-0">{{ inactive_members }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:notifications_list' %}" class="text-decoration-none">
+            <div class="card bg-info text-white text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Total Members</h5>
-                    <h2>{{ total_members }}</h2>
+                    <h5 class="card-title">Pending Notifications</h5>
+                    <h2 class="mb-0">{{ pending_count|default:0 }}</h2>
+                    <p class="mb-0" style="font-size: 0.9rem">Review in Notifications</p>
                 </div>
             </div>
         </a>
     </div>
+</div>
+
+<div class="row mb-4">
     <div class="col-md-3">
-        <a href="{% url 'sacco:savings_list' %}" class="text-decoration-none">
-            <div class="card bg-success text-white">
+        <a href="{% url 'sacco:loans_list' %}" class="text-decoration-none">
+            <div class="card bg-warning text-white text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Total Savings</h5>
-                    <h2>UGX {{ total_savings|floatformat:2 }}</h2>
+                    <h5 class="card-title">Total Loans</h5>
+                    <h2 class="mb-0">{{ total_loans }}</h2>
                 </div>
             </div>
         </a>
     </div>
     <div class="col-md-3">
         <a href="{% url 'sacco:loans_list' %}" class="text-decoration-none">
-            <div class="card bg-warning text-white">
+            <div class="card bg-success text-white text-center">
                 <div class="card-body">
-                    <h5 class="card-title">Total Loans Given Out</h5>
-                    <h2>UGX {{ total_loans_given_out|floatformat:2 }}</h2>
+                    <h5 class="card-title">Approved Loans</h5>
+                    <h2 class="mb-0">{{ approved_loans }}</h2>
                 </div>
             </div>
         </a>
     </div>
     <div class="col-md-3">
         <a href="{% url 'sacco:loans_list' %}" class="text-decoration-none">
-            <div class="card bg-info text-white">
+            <div class="card bg-danger text-white text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Rejected Loans</h5>
+                    <h2 class="mb-0">{{ rejected_loans }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:loans_list' %}" class="text-decoration-none">
+            <div class="card bg-info text-white text-center">
                 <div class="card-body">
                     <h5 class="card-title">Pending Loans</h5>
-                    <h6>Count: {{ pending_loans }}</h6>
-                    <h6>Amount: UGX {{ pending_loans_amount|floatformat:2 }}</h6>
+                    <h2 class="mb-0">{{ pending_loans }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <a href="{% url 'sacco:savings_list' %}" class="text-decoration-none">
+            <div class="card bg-success text-white text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Savings</h5>
+                    <h2 class="mb-0">UGX {{ total_savings|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <a href="{% url 'sacco:withdrawals_list' %}" class="text-decoration-none">
+            <div class="card bg-danger text-white text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Withdrawals</h5>
+                    <h2 class="mb-0">UGX {{ total_withdrawals_amount|floatformat:2 }}</h2>
+                    <p class="mb-0" style="font-size: 0.9rem">Count: {{ total_withdrawals_count }}</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:withdrawals_list' %}" class="text-decoration-none">
+            <div class="card bg-warning text-white text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Withdrawals</h5>
+                    <h2 class="mb-0">{{ pending_withdrawals_count }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:withdrawals_list' %}" class="text-decoration-none">
+            <div class="card bg-success text-white text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Approved Withdrawals</h5>
+                    <h2 class="mb-0">{{ approved_withdrawals_count }}</h2>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'sacco:withdrawals_list' %}" class="text-decoration-none">
+            <div class="card bg-secondary text-white text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Rejected Withdrawals</h5>
+                    <h2 class="mb-0">{{ rejected_withdrawals_count }}</h2>
                 </div>
             </div>
         </a>
@@ -130,3 +224,4 @@
     </div>
 </div>
 {% endblock %}
+

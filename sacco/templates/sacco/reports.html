@@ -10,29 +10,8 @@
 </div>
 
 <div class="row mt-4">
-    <div class="col-md-4">
-        <div class="card bg-info text-white mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Total Member Savings</h5>
-                <p class="card-text">UGX {{ total_savings|floatformat:2 }}</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card bg-warning text-white mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Total Loans Issued</h5>
-                <p class="card-text">UGX {{ total_loans_issued|floatformat:2 }}</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card bg-success text-white mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Total Loan Repayments</h5>
-                <p class="card-text">UGX {{ total_loan_payments|floatformat:2 }}</p>
-            </div>
-        </div>
+    <div class="col-12">
+        <p>Use the export options below to generate detailed reports for members, savings, loans, withdrawals and payments.</p>
     </div>
 </div>
 {% endblock %}

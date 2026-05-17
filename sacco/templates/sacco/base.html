@@ -17,11 +17,18 @@
                 <a class="nav-link" href="{% url 'sacco:loans_list' %}">Loans</a>
                 <a class="nav-link" href="{% url 'sacco:payments_list' %}">Payments</a>
                 <a class="nav-link" href="{% url 'sacco:reports' %}">Reports</a>
+                <a class="nav-link" href="{% url 'sacco:notifications_list' %}">Notifications</a>
             </div>
             <div class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                     <span class="navbar-text me-3">Hello, {{ user.get_full_name|default:user.username }}</span>
                     <a class="nav-link" href="{% url 'sacco:settings' %}">Settings</a>
+                    {% if user.is_staff and not user.is_superuser %}
+                        <a class="nav-link" href="{% url 'sacco:admin_notifications' %}">Admin Notifications</a>
+                    {% endif %}
+                    {% if user.is_superuser %}
+                        <a class="nav-link" href="{% url 'sacco:superadmin_notifications' %}">Superadmin Notifications</a>
+                    {% endif %}
                     <a class="nav-link" href="{% url 'sacco:logout' %}">Logout</a>
                 {% else %}
                     <a class="nav-link" href="{% url 'sacco:login' %}">Login</a>
